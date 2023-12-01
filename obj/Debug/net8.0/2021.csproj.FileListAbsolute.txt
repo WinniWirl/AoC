@@ -1,0 +1,15 @@
+C:\Data\AdventOfCode\dotNet\bin\Debug\net8.0\2021.exe
+C:\Data\AdventOfCode\dotNet\bin\Debug\net8.0\2021.deps.json
+C:\Data\AdventOfCode\dotNet\bin\Debug\net8.0\2021.runtimeconfig.json
+C:\Data\AdventOfCode\dotNet\bin\Debug\net8.0\2021.dll
+C:\Data\AdventOfCode\dotNet\bin\Debug\net8.0\2021.pdb
+C:\Data\AdventOfCode\dotNet\obj\Debug\net8.0\2021.GeneratedMSBuildEditorConfig.editorconfig
+C:\Data\AdventOfCode\dotNet\obj\Debug\net8.0\2021.AssemblyInfoInputs.cache
+C:\Data\AdventOfCode\dotNet\obj\Debug\net8.0\2021.AssemblyInfo.cs
+C:\Data\AdventOfCode\dotNet\obj\Debug\net8.0\2021.csproj.CoreCompileInputs.cache
+C:\Data\AdventOfCode\dotNet\obj\Debug\net8.0\2021.sourcelink.json
+C:\Data\AdventOfCode\dotNet\obj\Debug\net8.0\2021.dll
+C:\Data\AdventOfCode\dotNet\obj\Debug\net8.0\refint\2021.dll
+C:\Data\AdventOfCode\dotNet\obj\Debug\net8.0\2021.pdb
+C:\Data\AdventOfCode\dotNet\obj\Debug\net8.0\2021.genruntimeconfig.cache
+C:\Data\AdventOfCode\dotNet\obj\Debug\net8.0\ref\2021.dll

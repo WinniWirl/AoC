@@ -1,23 +1,13 @@
 using System.Collections;
 using System.Globalization;
 using System.Numerics;
+using AoC_Day;
 using Helper;
 
-namespace Day4
+namespace AoC2021_Day4
 {
-    class AOCProgram {
-        private string _day = "0";
-
-        public string day {
-            get { return _day; }
-            set {
-                _day = value;
-                if (!day.Equals(DateTime.Today.Day.ToString())){
-                    Console.WriteLine("WARNING: Todays date does not equal your puzzles.");
-                }
-            }
-        }
-
+    class AOCProgram : AoCDay, ISolvable {
+      
         public void SolvePart1(){
             List<string> input = Helper.Helper.getInputAsLinesOfCurrentDay(day);
             //fist line are nubers to check
