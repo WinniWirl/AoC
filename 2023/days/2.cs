@@ -25,8 +25,6 @@ namespace AoC2023_Day2
             List<string> lines = Helper.Helper.getInputAsLinesOfCurrentDay(day);
             foreach (string line in lines)
             {
-                string pattern = @"\d+";
-                //int gameId = int.Parse(Regex.Match(line, pattern).Value);
                 sum += calcPowerOfGame(line);
             }
             Console.WriteLine($"Die Lösung für Part 1 ist: {sum}");
