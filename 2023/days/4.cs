@@ -56,7 +56,7 @@ namespace AoC2023_Day4
         List<int> winningNumbers = [];
         List<int> myNumbers = [];
 
-        public int copys {get;} = 1;
+        public int copys {get; set;} = 1;
         
         public Scratchcard(string input){
                 string[] splitted = input.Split(":")[1].Split("|", StringSplitOptions.RemoveEmptyEntries); 
@@ -77,7 +77,7 @@ namespace AoC2023_Day4
         }
 
         public void addCopy(int amount){
-            copys += amount;
+            this.copys += amount;
         }
     }
 }
