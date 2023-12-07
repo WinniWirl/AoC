@@ -5,17 +5,6 @@ using Helper;
 namespace AoC2023_Day4
 {
     class AOCProgram : AoCDay, ISolvable {
-        private string _day = "0";
-
-        public string day {
-            get { return _day; }
-            set {
-                _day = value;
-                if (!day.Equals(DateTime.Today.Day.ToString())){
-                    Console.WriteLine("WARNING: Todays date does not equal your puzzles.");
-                }
-            }
-        }
 
         public void SolvePart1(){
             List<string> lines = Helper.Helper.getInputAsLinesOfCurrentDay(day);

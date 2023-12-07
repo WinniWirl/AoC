@@ -43,6 +43,24 @@ namespace Helper
             
             return result;
         }
+
+        public static List<List<string>> getInputAsGroupOfCurrentDay(string day){
+            List<string> lines = getInputAsLinesOfCurrentDay(day);
+            List<string> tmp = [];
+            List<List<string>> groups = [];
+            
+            foreach (string line in lines)
+            {
+                if(line.Length == 0) {
+                    groups.Add(new List<string>(tmp));
+                    tmp = [];
+                    continue;
+                }
+                tmp.Add(line);
+            }
+            groups.Add(new List<string>(tmp));
+            return groups;
+        }
     }
 
     static class Matrix<T>
