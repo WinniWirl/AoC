@@ -50,8 +50,11 @@ namespace AoC2023_Day8
                 if(key[2] == 'Z') endPoints.Add(key);
             });
 
+            // startPoints.ForEach(Console.WriteLine);
+            // endPoints.ForEach(Console.WriteLine);
+
             List<(long start, long size)> loops = [];
-            startPoints.ForEachIndexed((sp, index) => {
+            startPoints.ForEach(sp => {
                 int loopSize = -1;
                 int distanceToLoopStart = -1;
                 int counter = 0;
@@ -60,12 +63,14 @@ namespace AoC2023_Day8
 
                 while(loopSize == -1){
                     if(commandIndex == commands.Length) commandIndex = 0;
-                    if(endPoints.Where(endPoint => endPoint.Equals(currentKey)).ToArray().Length > 0) {
-                        Console.Write(currentKey + " ");
+                    Console.WriteLine(currentKey);
+                    if(endPoints.Contains(currentKey)) {
                         if(distanceToLoopStart == -1) {
+                            Console.WriteLine("1: " + counter);
                             distanceToLoopStart = counter;
                         }
                         else {
+                            Console.WriteLine("2: " + counter);
                             loopSize = counter - distanceToLoopStart;
                             loops.Add((distanceToLoopStart, loopSize));
                             Console.WriteLine($"Point {sp} has loopSize of {loopSize} and a {distanceToLoopStart} distance to it");
@@ -77,23 +82,24 @@ namespace AoC2023_Day8
                 }
             });
 
-            long result = 1;
-            loops.ForEach(loop => result = result * loop.size);
-            loops.ForEach(loop => result += loop.start);
-
-
             // while(loops.Where(l => loops[0].start == l.start).ToArray().Length != loops.Count)
             // {
-            //     // long minStart = loops.MinBy(l => l.start).start;
-            //     // // Console.WriteLine($"min is {minStart}");
-            //     // List<(long start, long size)> tmpLoops = [];
-            //     // foreach ((long start, long size) loop in loops)
-            //     // {
-            //     //     // if(loop.start == minStart) Console.WriteLine($"loop.start = {loop.start} + {loop.size}");
-            //     //     tmpLoops.Add((loop.start == minStart ? loop.start + loop.size : loop.start, loop.size));
-            //     // }
-            //     // loops = tmpLoops;
+            //     long minStart = loops.MinBy(l => l.start).start;
+            //     if(minStart % 1000000 == 0) Console.WriteLine($"min is {minStart}");
+            //     List<(long start, long size)> tmpLoops = [];
+            //     foreach ((long start, long size) loop in loops)
+            //     {
+            //         // if(loop.start == minStart) Console.WriteLine($"loop.start = {loop.start} + {loop.size}");
+            //         tmpLoops.Add((loop.start == minStart ? loop.start + loop.size : loop.start, loop.size));
+            //     }
+            //     loops = tmpLoops;
             // }
+
+            // loop1 = 
+
+            long result = 1;
+            loops.ForEach(loop => result = result * loop.size);
+
 
 
             Console.WriteLine($"Solution Day {day} Part 2: {result}");
