@@ -63,17 +63,17 @@ namespace AoC2023_Day8
 
                 while(loopSize == -1){
                     if(commandIndex == commands.Length) commandIndex = 0;
-                    Console.WriteLine(currentKey);
+                    // Console.WriteLine(currentKey);
                     if(endPoints.Contains(currentKey)) {
                         if(distanceToLoopStart == -1) {
-                            Console.WriteLine("1: " + counter);
+                            // Console.WriteLine("1: " + counter);
                             distanceToLoopStart = counter;
                         }
                         else {
-                            Console.WriteLine("2: " + counter);
+                            // Console.WriteLine("2: " + counter);
                             loopSize = counter - distanceToLoopStart;
                             loops.Add((distanceToLoopStart, loopSize));
-                            Console.WriteLine($"Point {sp} has loopSize of {loopSize} and a {distanceToLoopStart} distance to it");
+                            // Console.WriteLine($"Point {sp} has loopSize of {loopSize} and a {distanceToLoopStart} distance to it");
                         }
                     }
                     currentKey = commands[commandIndex] == 'L' ? currentKey = keyValuePairs[currentKey].left : currentKey = keyValuePairs[currentKey].right;
@@ -97,12 +97,28 @@ namespace AoC2023_Day8
 
             // loop1 = 
 
-            long result = 1;
-            loops.ForEach(loop => result = result * loop.size);
+            // loops.ForEach(loop => result = result * loop.size);
+            long result = 0;
 
-
+            bool isResult = false;
+            while(!isResult){
+                isResult = true;
+                result += loops[0].size;
+                // Console.WriteLine(result);
+                for (int i = 1; i < loops.Count; i++)
+                {
+                    if(!isMultiple(result, loops[i].size)) {
+                        isResult = false;
+                        break;
+                    }
+                }
+            }
 
             Console.WriteLine($"Solution Day {day} Part 2: {result}");
+        }
+
+        private bool isMultiple(long val1, long val2){
+            return val1 % val2 == 0;
         }
     }
 
