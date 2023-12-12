@@ -54,7 +54,47 @@ namespace AoC2023_Day12
 
         public void SolvePart2()
         {
-            throw new NotImplementedException();
+            List<string[]> input = Helper.Helper.getInputAsLinesOfCurrentDay(day).Select(l => l.Split(" ")).ToList();
+            //unfolding
+            input.ForEach(item => {
+                item[0] = item[0] + "?" + item[0] + "?" + item[0] + "?" + item[0] + "?" + item[0];
+                item[1] = item[1] + "," + item[1] + "," + item[1] + "," + item[1] + "," + item[1];
+            });  
+
+            input.ForEach(i => Console.WriteLine($"{i[0]} - {i[1]}"));     
+
+            input.ForEach(i => getAllPossibleSpringPatters(i[1], i[0].Length));     
+        }
+
+        public bool isInWhitelistPattern(string whitelistPattern, string springPattern){
+            if(whitelistPattern.Length != springPattern.Length) {
+                Console.WriteLine("WARNING! SHOULD NOT HAPPEN!");
+                return false;
+            }
+            for (int i = 0; i < whitelistPattern.Length; i++)
+            {
+                if(whitelistPattern[i] != '?' && whitelistPattern[i] != springPattern[i]) return false; 
+            }
+            return true;
+        }
+
+        public List<string> getAllPossibleSpringPatters(string rawPattern, int whitelistPatternLength){
+            List<int> commands = rawPattern.Split(",").Select(int.Parse).ToList();
+            int dotsToInsert = whitelistPatternLength - (commands.Count - 1) - commands.Sum();
+            Console.WriteLine($"Dots to insert available: {dotsToInsert}");
+
+            return [];
+        }
+
+        private List<string> appendSpringsFromPattern(string initialSpringPattern, List<int> commands, int dotsToInsert)
+        {
+            // List<string> springs = new List<string>();
+            // for (int i = 0; i < dotsToInsert; i++)
+            // {
+            //     springs.Add()
+            //     springs.AddRange(appendSpringsFromPattern(initialSpringPattern, commands, dotsToInsert));
+            // }     
+            return [];       
         }
     }
 }
