@@ -6,6 +6,7 @@
     <RootNamespace>_DOTNET</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AssemblyName>AdventOfCode_CSharp</AssemblyName>
   </PropertyGroup>
 
 </Project>
