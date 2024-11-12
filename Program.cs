@@ -15,7 +15,7 @@ using System.Security.Cryptography;
             Console.WriteLine($"Ho ho ho ho! Frohen {currentDay}. Dezember!");
 
             //FAKE DAY
-            currentDay = "13";
+            // currentDay = "13";
             await CheckForInputOfDay(currentDay);
             runDay(currentDay);
         }    

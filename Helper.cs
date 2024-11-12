@@ -63,35 +63,35 @@ namespace Helper
             return groups;
         }
 
-        public static List<GridElement> floodFill(List<GridElement> grid, (int x, int y) position)
+        public static List<Position> floodFill(List<Position> borders, Position position)
         {
-            int minX = grid.Min(t => t.position.x);
-            int maxX = grid.Max(t => t.position.x);
-            int minY = grid.Min(t => t.position.y);
-            int maxY = grid.Max(t => t.position.y);
+            int minX = borders.Min(t => t.x);
+            int maxX = borders.Max(t => t.x);
+            int minY = borders.Min(t => t.y);
+            int maxY = borders.Max(t => t.y);
 
-            var queue = new Queue<GridElement>();
-            queue.Enqueue(new GridElement(position));
+            var queue = new Queue<Position>();
+            queue.Enqueue(position);
             while(queue.Count > 0)
             {
                 // if(queue.Count % 100 == 0) Console.WriteLine($"Queue size: {queue.Count}");
-                GridElement element = queue.Dequeue();
-                if(element.position.x < minX || element.position.x >= maxX || element.position.y < minY || element.position.y >= maxY) continue;
-                if(grid.Contains(element)) continue;
-                grid.Add(element);
-                queue.Enqueue(new GridElement(element.positionOfTileIn(Direction.NORTH)));
-                queue.Enqueue(new GridElement(element.positionOfTileIn(Direction.SOUTH)));
-                queue.Enqueue(new GridElement(element.positionOfTileIn(Direction.WEST)));
-                queue.Enqueue(new GridElement(element.positionOfTileIn(Direction.EAST)));
+                Position element = queue.Dequeue();
+                if(element.x < minX || element.x >= maxX || element.y < minY || element.y >= maxY) continue;
+                if(borders.Contains(element)) continue;
+                borders.Add(element);
+                queue.Enqueue(position.North());
+                queue.Enqueue(position.South());
+                queue.Enqueue(position.East());
+                queue.Enqueue(position.West());
             }
-            return grid;
+            return borders;
         }
 
-        public static List<GridElement> fillInner(List<GridElement> grid){
-            int minX = grid.Min(t => t.position.x);
-            int maxX = grid.Max(t => t.position.x);
-            int minY = grid.Min(t => t.position.y);
-            int maxY = grid.Max(t => t.position.y);
+        public static List<Position> fillInner(List<Position> borders){
+            int minX = borders.Min(t => t.x);
+            int maxX = borders.Max(t => t.x);
+            int minY = borders.Min(t => t.y);
+            int maxY = borders.Max(t => t.y);
             
 
             for (int y = minY; y < maxY; y++)
@@ -100,8 +100,8 @@ namespace Helper
                 bool lastWasBorder = false;
                 for (int x = minX; x < maxX; x++)
                 {
-                    GridElement element = new GridElement((x, y));
-                    if(grid.Contains(element)) {
+                    Position element = new Position(x, y);
+                    if(borders.Contains(element)) {
                         if(!lastWasBorder) {
                             isInside = !isInside;
                             lastWasBorder = true;
@@ -110,38 +110,76 @@ namespace Helper
                     else 
                     {
                         lastWasBorder = false;
-                        if(isInside) grid.Add(element);
+                        if(isInside) borders.Add(element);
                     }
                 }
             }
 
-            return grid;
+            return borders;
         }
     }
 
-    class GridElement{
-        public (int x, int y) position;
+    class GridElement<T>{
+        public Position position;
 
-        public (int x, int y) positionOfTileIn(Direction direction) {
-            switch (direction)
-            {
-                case Direction.NORTH: return (position.x, position.y - 1);
-                case Direction.EAST: return (position.x + 1, position.y);
-                case Direction.SOUTH: return (position.x, position.y + 1);
-                case Direction.WEST: return (position.x - 1, position.y);
-                default: throw new ArgumentOutOfRangeException();
-            }
+        public T data;
+
+        public GridElement(T data, (int x, int y) position){
+            this.position = new Position(position.x, position.y);
+            this.data = data;
         }
 
-        public GridElement((int x, int y) position){
+        public GridElement(T data, Position position) {
             this.position = position;
+            this.data = data;
+        }
+
+        public GridElement(T data, int x, int y) {
+            this.position = new Position(x, y);
+            this.data = data;
+        }
+    }
+
+    class Position3{
+        public int x, y, z;
+
+        public Position3 (int x, int y, int z){
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+    }
+
+    class Position{
+        public int x; 
+        public int y;
+
+        public Position(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public Position North() { return new Position(x, y-1);}
+        public Position South() { return new Position(x, y+1);}
+        public Position East() { return new Position(x+1, y);}
+        public Position West() { return new Position(x-1, y);}
+
+        public Position positionIn( Direction direction) {
+            switch (direction)
+            {
+                case Direction.NORTH: return North();
+                case Direction.EAST: return East();
+                case Direction.SOUTH: return South();
+                case Direction.WEST: return West();
+                default: throw new ArgumentOutOfRangeException();
+            }
         }
 
         public override bool Equals(object? obj)
         {
             if (obj == null) return false;
-            GridElement other = (GridElement)obj;
-            if (position.x != other.position.x || position.y != other.position.y) return false;
+            Position other = (Position)obj;
+            if (x != other.x || y != other.y) return false;
             return true;
         }
 
@@ -150,8 +188,8 @@ namespace Helper
             unchecked
             {
                 int hash = 3;
-                hash = hash * 23 * position.x.GetHashCode();
-                hash = hash * 23 * position.y.GetHashCode();
+                hash = hash * 23 * x.GetHashCode();
+                hash = hash * 23 * y.GetHashCode();
                 return hash;
             }
         }
