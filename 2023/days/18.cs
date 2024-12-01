@@ -1,4 +1,3 @@
-using System.Drawing;
 using AoC_Day;
 using Helper;
 

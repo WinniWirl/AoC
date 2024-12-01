@@ -7,6 +7,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>AdventOfCode_CSharp</AssemblyName>
+    <UserSecretsId>e8fc35c4-918b-49ca-8e4e-69b5a2425dbd</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="2024\inputs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.0" />
+  </ItemGroup>
 
 </Project>

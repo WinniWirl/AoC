@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using AoC_Day;
-using Helper;
 
 namespace AoC2023_Day1
 {

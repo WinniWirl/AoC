@@ -1,7 +1,3 @@
-using System.Collections;
-using AdventOfCode;
-using AoC2023_Day18;
-
 namespace Helper
 {
     static class Helper {
