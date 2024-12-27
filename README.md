@@ -9,7 +9,7 @@ Die Files mit den Lösungen haben folgenden Aufbau: <br>
 ```C#
 using AoC_Day;
 
-namespace AoC2023_DayX
+namespace AoC2024_DayX
 {
     class AOCProgram : AoCDay, ISolvable
     {
