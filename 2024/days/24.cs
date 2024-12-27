@@ -37,6 +37,7 @@ namespace AoC2024_Day24
                 }
             }
 
+            throw new NotImplementedException();
 
         }
     }
