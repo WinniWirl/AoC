@@ -5,7 +5,7 @@ namespace AdventOfCode
     class AdventOfCode
     {
         private static readonly string sessionId;
-        public static string year = "2024";
+        public static string year = "2025";
 
         static AdventOfCode()
         {
@@ -18,10 +18,10 @@ namespace AdventOfCode
         public static async Task Main(String[] args)
         {
             string currentDay = DateTime.Today.Day.ToString();
+            //FAKE DAY
+            // currentDay = "5";
             Console.WriteLine($"Ho ho ho ho! Frohen {currentDay}. Dezember!");
 
-            //FAKE DAY
-            // currentDay = "13";
             await CheckForInputOfDay(currentDay);
             runDay(currentDay);
         }
