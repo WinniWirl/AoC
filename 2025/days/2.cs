@@ -15,7 +15,7 @@ namespace AoC2025_Day2
                 string[] numbers = part.Split("-");
                 long a = long.Parse(numbers[0]);
                 long b = long.Parse(numbers[1]);
-
+            
                 for (long number = a; number <= b; number++)
                 {
                     string numStr = number.ToString();
@@ -35,23 +35,42 @@ namespace AoC2025_Day2
         public void SolvePart2()
         {
             var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day)[0];
-            string[] parts = rawInput.Split(',');
-            var result = 0L;
-            foreach (string part in parts)
-            {
-                string[] numbers = part.Split("-");
-                long a = long.Parse(numbers[0]);
-                long b = long.Parse(numbers[1]);
+            var result =
+                rawInput.Split(",")
+                    .Select(input => input.Split("-"))
+                    .SelectMany(range => NumbersInRange(range[0], range[1]))
+                    .Where(number => Regex.IsMatch(number.ToString(), @"^(\d+)(\1)+$"))
+                    .Sum();
 
-                for (long number = a; number <= b; number++)
-                {
-                    if (Regex.IsMatch(number.ToString(), "^(\\d+)(\\1)+$"))
-                    {
-                        result+=number;
-                    }
-                }
-            }
             Console.WriteLine(result);
+        }
+
+        private static IEnumerable<long> NumbersInRange(string start, string end)
+        {
+            for (var n = long.Parse(start); n <= long.Parse(end); n++)
+                yield return n;
         }
     }
 }
+
+// public void SolvePart2()
+// {
+//     var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day)[0];
+//     string[] parts = rawInput.Split(',');
+//     var result = 0L;
+//     foreach (string part in parts)
+//     {
+//         string[] numbers = part.Split("-");
+//         long a = long.Parse(numbers[0]);
+//         long b = long.Parse(numbers[1]);
+//
+//         for (long number = a; number <= b; number++)
+//         {
+//             if (Regex.IsMatch(number.ToString(), "^(\\d+)(\\1)+$"))
+//             {
+//                 result+=number;
+//             }
+//         }
+//     }
+//     Console.WriteLine(result);
+// }
