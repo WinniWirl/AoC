@@ -8,24 +8,24 @@ namespace AoC2025_Day2
         public void SolvePart1()
         {
             var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day)[0];
-            string[] parts = rawInput.Split(',');
+            var parts = rawInput.Split(',');
             var result = 0L;
-            foreach (string part in parts)
+            foreach (var part in parts)
             {
-                string[] numbers = part.Split("-");
-                long a = long.Parse(numbers[0]);
-                long b = long.Parse(numbers[1]);
-            
-                for (long number = a; number <= b; number++)
+                var numbers = part.Split("-");
+                var a = long.Parse(numbers[0]);
+                var b = long.Parse(numbers[1]);
+
+                for (var number = a; number <= b; number++)
                 {
-                    string numStr = number.ToString();
+                    var numStr = number.ToString();
                     if (numStr.Length % 2 != 0) continue;
-                    
-                    string firstHalf = numStr.Substring(0, numStr.Length / 2);
-                    string secondHalf = numStr.Substring(numStr.Length / 2);
+
+                    var firstHalf = numStr.Substring(0, numStr.Length / 2);
+                    var secondHalf = numStr.Substring(numStr.Length / 2);
                     if (firstHalf.Equals(secondHalf))
                     {
-                        result+=number;
+                        result += number;
                     }
                 }
             }
@@ -50,27 +50,29 @@ namespace AoC2025_Day2
             for (var n = long.Parse(start); n <= long.Parse(end); n++)
                 yield return n;
         }
+
+
+        public void SolvePart2_no_LINQ()
+        {
+            var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day)[0];
+            string[] parts = rawInput.Split(',');
+            var result = 0L;
+            foreach (string part in parts)
+            {
+                string[] numbers = part.Split("-");
+                long a = long.Parse(numbers[0]);
+                long b = long.Parse(numbers[1]);
+
+                for (long number = a; number <= b; number++)
+                {
+                    if (Regex.IsMatch(number.ToString(), "^(\\d+)(\\1)+$"))
+                    {
+                        result += number;
+                    }
+                }
+            }
+
+            Console.WriteLine(result);
+        }
     }
 }
-
-// public void SolvePart2()
-// {
-//     var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day)[0];
-//     string[] parts = rawInput.Split(',');
-//     var result = 0L;
-//     foreach (string part in parts)
-//     {
-//         string[] numbers = part.Split("-");
-//         long a = long.Parse(numbers[0]);
-//         long b = long.Parse(numbers[1]);
-//
-//         for (long number = a; number <= b; number++)
-//         {
-//             if (Regex.IsMatch(number.ToString(), "^(\\d+)(\\1)+$"))
-//             {
-//                 result+=number;
-//             }
-//         }
-//     }
-//     Console.WriteLine(result);
-// }
