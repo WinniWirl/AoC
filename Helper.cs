@@ -1,3 +1,24 @@
+public static class EnumerableExtensions
+{
+    public static IEnumerable<T> Tap<T>(this IEnumerable<T> source, Action<T> action)
+    {
+        foreach (var item in source)
+        {
+            action(item);
+            yield return item;
+        }
+    }
+    
+    public static IEnumerable<T> PrintEach<T>(this IEnumerable<T> source, string prefix = "", string suffix = "")
+    {
+        foreach (var item in source)
+        {
+            Console.WriteLine(prefix + item + suffix);
+            yield return item;
+        }
+    }
+}
+
 namespace Helper
 {
     static class Helper {
