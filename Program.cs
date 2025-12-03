@@ -14,7 +14,7 @@ namespace AdventOfCode
             var configuration = builder.Build();
             sessionId = configuration["AOC_SessionID"];
         }
-        
+
         public static async Task Main(String[] args)
         {
             string currentDay = DateTime.Today.Day.ToString();
@@ -28,7 +28,7 @@ namespace AdventOfCode
 
         private static void runDay(string day)
         {
-            Type? classOfDay = Type.GetType($"AoC{year}_Day{day}.AOCProgram");
+            Type? classOfDay = Type.GetType($"AoC{year}_Day{day}.AocProgram");
             if (classOfDay == null)
             {
                 Console.WriteLine($"Für Tag {day} ist kein namespace gefunden worden.");
