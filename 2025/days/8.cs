@@ -64,7 +64,94 @@ namespace AoC2025_Day8
 
         public void SolvePart2()
         {
-            throw new NotImplementedException();
+                        var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day);
+            var junctionBoxes = rawInput.Select(input => new JunctionBox(input))
+                // .PrintEach()
+                .ToList();
+            var connections = GetAllPossibleConnections(junctionBoxes);
+            connections = connections.OrderBy(c => c.Length()).ToList();
+            
+            var connectionGroups = new List<ConnectionGroup>();
+
+            var index = 0;
+
+            for (int i = 0; i < 10; i++)
+            {
+                index = i;
+                var connection = connections[i];
+                
+                var matchingGroups = isPartOfExistingConnectionGroup(connection, connectionGroups);
+                
+                if (matchingGroups.Count == 0)
+                {
+                    // Console.WriteLine("No matching connection groups found");
+                    var newGroup = new ConnectionGroup(new List<Connection> { connection });
+                    connectionGroups.Add(newGroup);
+                }
+                else if (matchingGroups.Count == 1)
+                {
+                    // Console.WriteLine("Matching connection group found");
+                    matchingGroups[0].AddConnection(connection);
+                }
+                else
+                {
+                    // Console.WriteLine("Multiple matching connection groups found, merging them");
+                    var newGroup = new ConnectionGroup(new List<Connection> { connection });
+                    foreach (var group in matchingGroups)
+                    {
+                        newGroup.AddConnections(group);
+                        connectionGroups.Remove(group);
+                    }
+
+                    connectionGroups.Add(newGroup);
+                }
+            }
+
+            var connection1 = connections[index];
+            
+            while (connectionGroups.Count > 1)
+            {
+                connection1 = connections[index];
+                
+                var matchingGroups = isPartOfExistingConnectionGroup(connection1, connectionGroups);
+
+                if (matchingGroups.Count == 0)
+                {
+                    // Console.WriteLine("No matching connection groups found");
+                    var newGroup = new ConnectionGroup(new List<Connection> { connection1 });
+                    connectionGroups.Add(newGroup);
+                }
+                else if (matchingGroups.Count == 1)
+                {
+                    // Console.WriteLine("Matching connection group found");
+                    matchingGroups[0].AddConnection(connection1);
+                }
+                else
+                {
+                    // Console.WriteLine("Multiple matching connection groups found, merging them");
+                    var newGroup = new ConnectionGroup(new List<Connection> { connection1 });
+                    foreach (var group in matchingGroups)
+                    {
+                        newGroup.AddConnections(group);
+                        connectionGroups.Remove(group);
+                    }
+
+                    connectionGroups.Add(newGroup);
+                }
+                index++;
+            }
+            
+            
+            
+            Console.WriteLine("Total Amount Connections: " + connections.Count);
+            Console.WriteLine("Total Amount found connection Groups: " + connectionGroups.Count);
+            Console.WriteLine("Last Connection used: " + connection1 + " at index " + index);
+            Console.WriteLine("Connection Before: " + connections[index -1]);
+
+            var result = connection1.Box1.x * connection1.Box2.x;
+            Console.WriteLine("Result: " + result);
+            
+            //already tried 46571580
         }
         
         public List<ConnectionGroup> isPartOfExistingConnectionGroup(Connection connection, List<ConnectionGroup> groups)
@@ -162,7 +249,7 @@ namespace AoC2025_Day8
 
     class JunctionBox
     {
-        private readonly long x, y, z;
+        public readonly long x, y, z;
 
         public JunctionBox(long x, long y, long z)
         {
