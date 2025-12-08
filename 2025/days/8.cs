@@ -2,7 +2,7 @@ using AoC_Day;
 
 namespace AoC2025_Day8
 {
-    class AocProgram : AoCDay, ISolvable
+    internal class AocProgram : AoCDay, ISolvable
     {
         public void SolvePart1()
         {
@@ -11,50 +11,48 @@ namespace AoC2025_Day8
                 // .PrintEach()
                 .ToList();
             var connections = GetAllPossibleConnections(junctionBoxes);
+            
             connections = connections.OrderBy(c => c.Length()).ToList();
 
             var connectionGroups = new List<ConnectionGroup>();
 
-            for (int i = 0; i < 1000; i++)
+            for (var i = 0; i < 1000; i++)
             {
                 var connection = connections[i];
 
-                var matchingGroups = isPartOfExistingConnectionGroup(connection, connectionGroups);
+                var matchingGroups = IsPartOfExistingConnectionGroup(connection, connectionGroups);
 
-                if (matchingGroups.Count == 0)
+                switch (matchingGroups.Count)
                 {
-                    // Console.WriteLine("No matching connection groups found");
-                    var newGroup = new ConnectionGroup(new List<Connection> { connection });
-                    connectionGroups.Add(newGroup);
-                }
-                else if (matchingGroups.Count == 1)
-                {
-                    // Console.WriteLine("Matching connection group found");
-                    matchingGroups[0].AddConnection(connection);
-                }
-                else
-                {
-                    // Console.WriteLine("Multiple matching connection groups found, merging them");
-                    var newGroup = new ConnectionGroup(new List<Connection> { connection });
-                    foreach (var group in matchingGroups)
+                    case 0:
                     {
-                        newGroup.AddConnections(group);
-                        connectionGroups.Remove(group);
+                        // Console.WriteLine("No matching connection groups found");
+                        var newGroup = new ConnectionGroup([connection]);
+                        connectionGroups.Add(newGroup);
+                        break;
                     }
+                    case 1:
+                        // Console.WriteLine("Matching connection group found");
+                        matchingGroups[0].AddConnection(connection);
+                        break;
+                    default:
+                    {
+                        // Console.WriteLine("Multiple matching connection groups found, merging them");
+                        var newGroup = new ConnectionGroup([connection]);
+                        foreach (var group in matchingGroups)
+                        {
+                            newGroup.AddConnections(group);
+                            connectionGroups.Remove(group);
+                        }
 
-                    connectionGroups.Add(newGroup);
+                        connectionGroups.Add(newGroup);
+                        break;
+                    }
                 }
             }
-
+            
             Console.WriteLine("Total Amount Connections: " + connections.Count);
             Console.WriteLine("Total Amount found connection Groups: " + connectionGroups.Count);
-            // Console.WriteLine(connectionGroups[0]);
-            // result is product of sizes of each connection group
-            // foreach (var connectionGroup in connectionGroups)
-            // {
-            //     Console.WriteLine("COUNT: " + connectionGroup.CountBoxes());
-            //     // Console.WriteLine(connectionGroup);
-            // }
 
             //take 3 largest connection groups
             connectionGroups = connectionGroups.OrderByDescending(g => g.CountBoxes()).Take(3).ToList();
@@ -81,68 +79,59 @@ namespace AoC2025_Day8
                 connection = connections[i];
                 Console.WriteLine("Connecting: " + connection + " at index " + i);
 
-                var matchingGroups = isPartOfExistingConnectionGroup(connection, connectionGroups);
+                var matchingGroups = IsPartOfExistingConnectionGroup(connection, connectionGroups);
 
-                if (matchingGroups.Count == 0)
+                switch (matchingGroups.Count)
                 {
-                    // Console.WriteLine("No matching connection groups found");
-                    var newGroup = new ConnectionGroup(new List<Connection> { connection });
-                    connectionGroups.Add(newGroup);
-                }
-                else if (matchingGroups.Count == 1)
-                {
-                    // Console.WriteLine("Matching connection group found");
-                    matchingGroups[0].AddConnection(connection);
-                }
-                else
-                {
-                    // Console.WriteLine("Multiple matching connection groups found, merging them");
-                    var newGroup = new ConnectionGroup(new List<Connection> { connection });
-                    foreach (var group in matchingGroups)
+                    case 0:
                     {
-                        newGroup.AddConnections(group);
-                        connectionGroups.Remove(group);
+                        // Console.WriteLine("No matching connection groups found");
+                        var newGroup = new ConnectionGroup([connection]);
+                        connectionGroups.Add(newGroup);
+                        break;
                     }
+                    case 1:
+                        // Console.WriteLine("Matching connection group found");
+                        matchingGroups[0].AddConnection(connection);
+                        break;
+                    default:
+                    {
+                        // Console.WriteLine("Multiple matching connection groups found, merging them");
+                        var newGroup = new ConnectionGroup([connection]);
+                        foreach (var group in matchingGroups)
+                        {
+                            newGroup.AddConnections(group);
+                            connectionGroups.Remove(group);
+                        }
 
-                    connectionGroups.Add(newGroup);
+                        connectionGroups.Add(newGroup);
+                        break;
+                    }
                 }
 
                 i++;
             }
             
-
             Console.WriteLine("Total Amount Connections: " + connections.Count);
             Console.WriteLine("Total Amount found connection Groups: " + connectionGroups.Count);
             Console.WriteLine("Last Connection used: " + connection + " at index " + i);
-            Console.WriteLine("Connection Before: " + connections[i - 1]);
 
             var result = connection.Box1.x * connection.Box2.x;
             Console.WriteLine("Result: " + result);
-
-            //already tried 46571580
         }
 
-        public List<ConnectionGroup> isPartOfExistingConnectionGroup(Connection connection,
+        private static List<ConnectionGroup> IsPartOfExistingConnectionGroup(Connection connection,
             List<ConnectionGroup> groups)
         {
-            var matchingGroups = new List<ConnectionGroup>();
-            foreach (var group in groups)
-            {
-                if (group.IsPartOfConnection(connection))
-                {
-                    matchingGroups.Add(group);
-                }
-            }
-
-            return matchingGroups;
+            return groups.Where(group => group.IsPartOfConnection(connection)).ToList();
         }
 
-        public List<Connection> GetAllPossibleConnections(List<JunctionBox> boxes)
+        private static List<Connection> GetAllPossibleConnections(List<JunctionBox> boxes)
         {
             var connections = new List<Connection>();
-            for (int i = 0; i < boxes.Count; i++)
+            for (var i = 0; i < boxes.Count; i++)
             {
-                for (int j = i + 1; j < boxes.Count; j++)
+                for (var j = i + 1; j < boxes.Count; j++)
                 {
                     connections.Add(new Connection(boxes[i], boxes[j]));
                 }
@@ -152,39 +141,34 @@ namespace AoC2025_Day8
         }
     }
 
-    class ConnectionGroup(List<Connection> connections)
+    internal class ConnectionGroup(List<Connection> connections)
     {
-        public readonly List<Connection> Connections = connections;
+        private readonly List<Connection> _connections = connections;
 
         public void AddConnection(Connection connection)
         {
-            Connections.Add(connection);
+            _connections.Add(connection);
         }
 
         public void AddConnections(List<Connection> otherConnections)
         {
-            this.Connections.AddRange(otherConnections);
+            this._connections.AddRange(otherConnections);
         }
 
         public void AddConnections(ConnectionGroup group)
         {
-            this.Connections.AddRange(group.Connections);
+            this._connections.AddRange(group._connections);
         }
 
         public bool IsPartOfConnection(Connection connection)
         {
-            return Connections.Any(t => t.HasOverlap(connection));
+            return _connections.Any(t => t.HasOverlap(connection));
         }
-
-        public override string ToString()
-        {
-            return "ConnectionGroup(" + string.Join(", ", Connections.Select(c => c.ToString())) + ")";
-        }
-
+        
         public int CountBoxes()
         {
             var boxes = new HashSet<JunctionBox>();
-            foreach (var connection in Connections)
+            foreach (var connection in _connections)
             {
                 boxes.Add(connection.Box1);
                 boxes.Add(connection.Box2);
@@ -192,9 +176,14 @@ namespace AoC2025_Day8
 
             return boxes.Count;
         }
+        
+        public override string ToString()
+        {
+            return "ConnectionGroup(" + string.Join(", ", _connections.Select(c => c.ToString())) + ")";
+        }
     }
 
-    class Connection(JunctionBox box1, JunctionBox box2)
+    internal class Connection(JunctionBox box1, JunctionBox box2)
     {
         public readonly JunctionBox Box1 = box1, Box2 = box2;
 
@@ -203,7 +192,7 @@ namespace AoC2025_Day8
             return Box1.DistanceTo(Box2);
         }
 
-        public bool HasBox(JunctionBox obj)
+        private bool HasBox(JunctionBox obj)
         {
             return this.Box1.Equals(obj) || this.Box2.Equals(obj);
         }
@@ -219,7 +208,7 @@ namespace AoC2025_Day8
         }
     }
 
-    class JunctionBox
+    internal class JunctionBox
     {
         public readonly long x, y, z;
 
@@ -232,7 +221,7 @@ namespace AoC2025_Day8
 
         public JunctionBox(string junction)
         {
-            string[] split = junction.Split(',');
+            var split = junction.Split(',');
             this.x = long.Parse(split[0]);
             this.y = long.Parse(split[1]);
             this.z = long.Parse(split[2]);
@@ -245,9 +234,9 @@ namespace AoC2025_Day8
 
         public double DistanceTo(JunctionBox other)
         {
-            long dx = this.x - other.x;
-            long dy = this.y - other.y;
-            long dz = this.z - other.z;
+            var dx = this.x - other.x;
+            var dy = this.y - other.y;
+            var dz = this.z - other.z;
             return Math.Sqrt(dx * dx + dy * dy + dz * dz);
         }
 
