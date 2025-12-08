@@ -4,57 +4,26 @@ namespace AoC2025_Day8
 {
     internal class AocProgram : AoCDay, ISolvable
     {
-        public void SolvePart1()
+            public void SolvePart1()
         {
+            const int numberOfConnectionsToProcess = 1000;
             var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day);
-            var junctionBoxes = rawInput.Select(input => new JunctionBox(input))
-                // .PrintEach()
-                .ToList();
+            var junctionBoxes = rawInput.Select(input => new JunctionBox(input)).ToList();
             var connections = GetAllPossibleConnections(junctionBoxes);
-            
             connections = connections.OrderBy(c => c.Length()).ToList();
-
+            
             var connectionGroups = new List<ConnectionGroup>();
-
-            for (var i = 0; i < 1000; i++)
+            
+            for (var i = 0; i < numberOfConnectionsToProcess; i++)
             {
                 var connection = connections[i];
 
-                var matchingGroups = IsPartOfExistingConnectionGroup(connection, connectionGroups);
-
-                switch (matchingGroups.Count)
-                {
-                    case 0:
-                    {
-                        // Console.WriteLine("No matching connection groups found");
-                        var newGroup = new ConnectionGroup([connection]);
-                        connectionGroups.Add(newGroup);
-                        break;
-                    }
-                    case 1:
-                        // Console.WriteLine("Matching connection group found");
-                        matchingGroups[0].AddConnection(connection);
-                        break;
-                    default:
-                    {
-                        // Console.WriteLine("Multiple matching connection groups found, merging them");
-                        var newGroup = new ConnectionGroup([connection]);
-                        foreach (var group in matchingGroups)
-                        {
-                            newGroup.AddConnections(group);
-                            connectionGroups.Remove(group);
-                        }
-
-                        connectionGroups.Add(newGroup);
-                        break;
-                    }
-                }
+                ProcessConnectionGroup(connection, connectionGroups);
             }
-            
-            Console.WriteLine("Total Amount Connections: " + connections.Count);
-            Console.WriteLine("Total Amount found connection Groups: " + connectionGroups.Count);
 
             //take 3 largest connection groups
+            Console.WriteLine("Total Amount Connections: " + connections.Count);
+            Console.WriteLine("Total Amount found connection Groups: " + connectionGroups.Count);
             connectionGroups = connectionGroups.OrderByDescending(g => g.CountBoxes()).Take(3).ToList();
             var result = connectionGroups.Aggregate(1, (acc, group) => acc * group.CountBoxes());
             Console.WriteLine("Result: " + result);
@@ -74,7 +43,7 @@ namespace AoC2025_Day8
             var connection = connections[0];
             var i = 0;
 
-            while (i < 1000 || connectionGroups.Count > 1 || connectionGroups[0].CountBoxes() < junctionBoxes.Count)
+            while (connectionGroups.Count > 1 || connectionGroups[0].CountBoxes() < junctionBoxes.Count)
             {
                 connection = connections[i];
                 Console.WriteLine("Connecting: " + connection + " at index " + i);
@@ -138,6 +107,34 @@ namespace AoC2025_Day8
             }
 
             return connections;
+        }
+
+        private static void ProcessConnectionGroup(Connection connection, List<ConnectionGroup> connectionGroups)
+        {
+            var matchingGroups = IsPartOfExistingConnectionGroup(connection, connectionGroups);
+            switch (matchingGroups.Count)
+            {
+                case 0:
+                {
+                    var newGroup = new ConnectionGroup([connection]);
+                    connectionGroups.Add(newGroup);
+                    break;
+                }
+                case 1:
+                    matchingGroups[0].AddConnection(connection);
+                    break;
+                default:
+                {
+                    var newGroup = new ConnectionGroup([connection]);
+                    foreach (var group in matchingGroups)
+                    {
+                        newGroup.AddConnections(group);
+                        connectionGroups.Remove(group);
+                    }
+                    connectionGroups.Add(newGroup);
+                    break;
+                }
+            }
         }
     }
 
