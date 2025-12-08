@@ -4,29 +4,35 @@ namespace AoC2025_Day8
 {
     internal class AocProgram : AoCDay, ISolvable
     {
-            public void SolvePart1()
+        public void SolvePart1()
         {
             const int numberOfConnectionsToProcess = 1000;
+            
             var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day);
-            var junctionBoxes = rawInput.Select(input => new JunctionBox(input)).ToList();
+            var junctionBoxes =  rawInput.Select(input => new JunctionBox(input)).ToList();
+            
             var connections = GetAllPossibleConnections(junctionBoxes);
-            connections = connections.OrderBy(c => c.Length()).ToList();
+            var sortedConnections = connections.OrderBy(c => c.Length()).ToList();
             
             var connectionGroups = new List<ConnectionGroup>();
             
             for (var i = 0; i < numberOfConnectionsToProcess; i++)
             {
-                var connection = connections[i];
-
-                ProcessConnectionGroup(connection, connectionGroups);
+                ProcessConnectionGroup(sortedConnections[i], connectionGroups);
             }
-
-            //take 3 largest connection groups
-            Console.WriteLine("Total Amount Connections: " + connections.Count);
-            Console.WriteLine("Total Amount found connection Groups: " + connectionGroups.Count);
-            connectionGroups = connectionGroups.OrderByDescending(g => g.CountBoxes()).Take(3).ToList();
-            var result = connectionGroups.Aggregate(1, (acc, group) => acc * group.CountBoxes());
-            Console.WriteLine("Result: " + result);
+            
+            var result = CalculateResultFromTopGroups(connectionGroups, topCount: 3);
+            Console.WriteLine($"Result: {result}");
+        }
+        
+        private static int CalculateResultFromTopGroups(List<ConnectionGroup> connectionGroups, int topCount)
+        {
+            var topGroups = connectionGroups
+                .OrderByDescending(g => g.CountBoxes())
+                .Take(topCount)
+                .ToList();
+            
+            return topGroups.Aggregate(1, (acc, group) => acc * group.CountBoxes());
         }
 
         public void SolvePart2()
@@ -89,12 +95,18 @@ namespace AoC2025_Day8
             Console.WriteLine("Result: " + result);
         }
 
+        /// <summary>
+        /// Finds all connection groups that contain at least one box from the given connection.
+        /// </summary>
         private static List<ConnectionGroup> IsPartOfExistingConnectionGroup(Connection connection,
             List<ConnectionGroup> groups)
         {
             return groups.Where(group => group.IsPartOfConnection(connection)).ToList();
         }
 
+        /// <summary>
+        /// Generates all possible connections between junction boxes (n choose 2).
+        /// </summary>
         private static List<Connection> GetAllPossibleConnections(List<JunctionBox> boxes)
         {
             var connections = new List<Connection>();
@@ -109,6 +121,12 @@ namespace AoC2025_Day8
             return connections;
         }
 
+        /// <summary>
+        /// Processes a connection and assigns it to existing groups or creates a new group.
+        /// If the connection belongs to multiple groups, it merges them.
+        /// </summary>
+        /// <param name="connection">The connection to process</param>
+        /// <param name="connectionGroups">The list of existing connection groups</param>
         private static void ProcessConnectionGroup(Connection connection, List<ConnectionGroup> connectionGroups)
         {
             var matchingGroups = IsPartOfExistingConnectionGroup(connection, connectionGroups);
