@@ -12,15 +12,15 @@ namespace AoC2025_Day8
                 .ToList();
             var connections = GetAllPossibleConnections(junctionBoxes);
             connections = connections.OrderBy(c => c.Length()).ToList();
-            
+
             var connectionGroups = new List<ConnectionGroup>();
 
             for (int i = 0; i < 1000; i++)
             {
                 var connection = connections[i];
-                
+
                 var matchingGroups = isPartOfExistingConnectionGroup(connection, connectionGroups);
-                
+
                 if (matchingGroups.Count == 0)
                 {
                     // Console.WriteLine("No matching connection groups found");
@@ -45,7 +45,7 @@ namespace AoC2025_Day8
                     connectionGroups.Add(newGroup);
                 }
             }
-            
+
             Console.WriteLine("Total Amount Connections: " + connections.Count);
             Console.WriteLine("Total Amount found connection Groups: " + connectionGroups.Count);
             // Console.WriteLine(connectionGroups[0]);
@@ -55,7 +55,7 @@ namespace AoC2025_Day8
             //     Console.WriteLine("COUNT: " + connectionGroup.CountBoxes());
             //     // Console.WriteLine(connectionGroup);
             // }
-            
+
             //take 3 largest connection groups
             connectionGroups = connectionGroups.OrderByDescending(g => g.CountBoxes()).Take(3).ToList();
             var result = connectionGroups.Aggregate(1, (acc, group) => acc * group.CountBoxes());
@@ -64,24 +64,25 @@ namespace AoC2025_Day8
 
         public void SolvePart2()
         {
-                        var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day);
+            var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day);
             var junctionBoxes = rawInput.Select(input => new JunctionBox(input))
                 // .PrintEach()
                 .ToList();
             var connections = GetAllPossibleConnections(junctionBoxes);
             connections = connections.OrderBy(c => c.Length()).ToList();
-            
+
             var connectionGroups = new List<ConnectionGroup>();
 
-            var index = 0;
+            var connection = connections[0];
+            var i = 0;
 
-            for (int i = 0; i < 10; i++)
+            while (i < 1000 || connectionGroups.Count > 1 || connectionGroups[0].CountBoxes() < junctionBoxes.Count)
             {
-                index = i;
-                var connection = connections[i];
-                
+                connection = connections[i];
+                Console.WriteLine("Connecting: " + connection + " at index " + i);
+
                 var matchingGroups = isPartOfExistingConnectionGroup(connection, connectionGroups);
-                
+
                 if (matchingGroups.Count == 0)
                 {
                     // Console.WriteLine("No matching connection groups found");
@@ -105,56 +106,24 @@ namespace AoC2025_Day8
 
                     connectionGroups.Add(newGroup);
                 }
-            }
 
-            var connection1 = connections[index];
-            
-            while (connectionGroups.Count > 1)
-            {
-                connection1 = connections[index];
-                
-                var matchingGroups = isPartOfExistingConnectionGroup(connection1, connectionGroups);
-
-                if (matchingGroups.Count == 0)
-                {
-                    // Console.WriteLine("No matching connection groups found");
-                    var newGroup = new ConnectionGroup(new List<Connection> { connection1 });
-                    connectionGroups.Add(newGroup);
-                }
-                else if (matchingGroups.Count == 1)
-                {
-                    // Console.WriteLine("Matching connection group found");
-                    matchingGroups[0].AddConnection(connection1);
-                }
-                else
-                {
-                    // Console.WriteLine("Multiple matching connection groups found, merging them");
-                    var newGroup = new ConnectionGroup(new List<Connection> { connection1 });
-                    foreach (var group in matchingGroups)
-                    {
-                        newGroup.AddConnections(group);
-                        connectionGroups.Remove(group);
-                    }
-
-                    connectionGroups.Add(newGroup);
-                }
-                index++;
+                i++;
             }
             
-            
-            
+
             Console.WriteLine("Total Amount Connections: " + connections.Count);
             Console.WriteLine("Total Amount found connection Groups: " + connectionGroups.Count);
-            Console.WriteLine("Last Connection used: " + connection1 + " at index " + index);
-            Console.WriteLine("Connection Before: " + connections[index -1]);
+            Console.WriteLine("Last Connection used: " + connection + " at index " + i);
+            Console.WriteLine("Connection Before: " + connections[i - 1]);
 
-            var result = connection1.Box1.x * connection1.Box2.x;
+            var result = connection.Box1.x * connection.Box2.x;
             Console.WriteLine("Result: " + result);
-            
+
             //already tried 46571580
         }
-        
-        public List<ConnectionGroup> isPartOfExistingConnectionGroup(Connection connection, List<ConnectionGroup> groups)
+
+        public List<ConnectionGroup> isPartOfExistingConnectionGroup(Connection connection,
+            List<ConnectionGroup> groups)
         {
             var matchingGroups = new List<ConnectionGroup>();
             foreach (var group in groups)
@@ -164,9 +133,10 @@ namespace AoC2025_Day8
                     matchingGroups.Add(group);
                 }
             }
+
             return matchingGroups;
         }
-        
+
         public List<Connection> GetAllPossibleConnections(List<JunctionBox> boxes)
         {
             var connections = new List<Connection>();
@@ -177,6 +147,7 @@ namespace AoC2025_Day8
                     connections.Add(new Connection(boxes[i], boxes[j]));
                 }
             }
+
             return connections;
         }
     }
@@ -194,7 +165,7 @@ namespace AoC2025_Day8
         {
             this.Connections.AddRange(otherConnections);
         }
-        
+
         public void AddConnections(ConnectionGroup group)
         {
             this.Connections.AddRange(group.Connections);
@@ -204,12 +175,12 @@ namespace AoC2025_Day8
         {
             return Connections.Any(t => t.HasOverlap(connection));
         }
-        
+
         public override string ToString()
         {
             return "ConnectionGroup(" + string.Join(", ", Connections.Select(c => c.ToString())) + ")";
         }
-        
+
         public int CountBoxes()
         {
             var boxes = new HashSet<JunctionBox>();
@@ -218,10 +189,11 @@ namespace AoC2025_Day8
                 boxes.Add(connection.Box1);
                 boxes.Add(connection.Box2);
             }
+
             return boxes.Count;
         }
     }
-    
+
     class Connection(JunctionBox box1, JunctionBox box2)
     {
         public readonly JunctionBox Box1 = box1, Box2 = box2;
@@ -235,7 +207,7 @@ namespace AoC2025_Day8
         {
             return this.Box1.Equals(obj) || this.Box2.Equals(obj);
         }
-        
+
         public bool HasOverlap(Connection other)
         {
             return this.HasBox(other.Box1) || this.HasBox(other.Box2);
@@ -268,7 +240,7 @@ namespace AoC2025_Day8
 
         public override string ToString()
         {
-            return "JunctionBox(" + x + ", " + y + ", " + z + ")";
+            return "JunctionBox(" + x + "," + y + "," + z + ")";
         }
 
         public double DistanceTo(JunctionBox other)
@@ -278,13 +250,14 @@ namespace AoC2025_Day8
             long dz = this.z - other.z;
             return Math.Sqrt(dx * dx + dy * dy + dz * dz);
         }
-        
+
         public override bool Equals(object? obj)
         {
             if (obj is JunctionBox other)
             {
                 return this.x == other.x && this.y == other.y && this.z == other.z;
             }
+
             return false;
         }
 
