@@ -7,91 +7,59 @@ namespace AoC2025_Day8
         public void SolvePart1()
         {
             const int numberOfConnectionsToProcess = 1000;
-            
+
             var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day);
-            var junctionBoxes =  rawInput.Select(input => new JunctionBox(input)).ToList();
-            
+            var junctionBoxes = rawInput.Select(input => new JunctionBox(input)).ToList();
+
             var connections = GetAllPossibleConnections(junctionBoxes);
             var sortedConnections = connections.OrderBy(c => c.Length()).ToList();
-            
+
             var connectionGroups = new List<ConnectionGroup>();
-            
+
             for (var i = 0; i < numberOfConnectionsToProcess; i++)
             {
                 ProcessConnectionGroup(sortedConnections[i], connectionGroups);
             }
-            
+
             var result = CalculateResultFromTopGroups(connectionGroups, topCount: 3);
             Console.WriteLine($"Result: {result}");
         }
-        
+
         private static int CalculateResultFromTopGroups(List<ConnectionGroup> connectionGroups, int topCount)
         {
             var topGroups = connectionGroups
                 .OrderByDescending(g => g.CountBoxes())
                 .Take(topCount)
                 .ToList();
-            
+
             return topGroups.Aggregate(1, (acc, group) => acc * group.CountBoxes());
         }
 
         public void SolvePart2()
         {
             var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day);
-            var junctionBoxes = rawInput.Select(input => new JunctionBox(input))
-                // .PrintEach()
-                .ToList();
+            var junctionBoxes = rawInput.Select(input => new JunctionBox(input)).ToList();
+
             var connections = GetAllPossibleConnections(junctionBoxes);
-            connections = connections.OrderBy(c => c.Length()).ToList();
+            var sortedConnections = connections.OrderBy(c => c.Length()).ToList();
 
             var connectionGroups = new List<ConnectionGroup>();
 
-            var connection = connections[0];
             var i = 0;
 
-            while (connectionGroups.Count > 1 || connectionGroups[0].CountBoxes() < junctionBoxes.Count)
+            do
             {
-                connection = connections[i];
-                Console.WriteLine("Connecting: " + connection + " at index " + i);
-
-                var matchingGroups = IsPartOfExistingConnectionGroup(connection, connectionGroups);
-
-                switch (matchingGroups.Count)
-                {
-                    case 0:
-                    {
-                        // Console.WriteLine("No matching connection groups found");
-                        var newGroup = new ConnectionGroup([connection]);
-                        connectionGroups.Add(newGroup);
-                        break;
-                    }
-                    case 1:
-                        // Console.WriteLine("Matching connection group found");
-                        matchingGroups[0].AddConnection(connection);
-                        break;
-                    default:
-                    {
-                        // Console.WriteLine("Multiple matching connection groups found, merging them");
-                        var newGroup = new ConnectionGroup([connection]);
-                        foreach (var group in matchingGroups)
-                        {
-                            newGroup.AddConnections(group);
-                            connectionGroups.Remove(group);
-                        }
-
-                        connectionGroups.Add(newGroup);
-                        break;
-                    }
-                }
+                Console.WriteLine("Connecting: " + sortedConnections[i] + " at index " + i);
+                ProcessConnectionGroup(sortedConnections[i], connectionGroups);
 
                 i++;
-            }
-            
-            Console.WriteLine("Total Amount Connections: " + connections.Count);
-            Console.WriteLine("Total Amount found connection Groups: " + connectionGroups.Count);
-            Console.WriteLine("Last Connection used: " + connection + " at index " + i);
+            } while (connectionGroups.Count < 1 || connectionGroups[0].CountBoxes() < junctionBoxes.Count);
 
-            var result = connection.Box1.x * connection.Box2.x;
+            var lastConnection = sortedConnections[i - 1];
+
+            Console.WriteLine("Last Connection used: " + lastConnection + " at index " + (i - 1));
+
+            var result = lastConnection.Box1.x * lastConnection.Box2.x;
             Console.WriteLine("Result: " + result);
         }
 
@@ -149,6 +117,7 @@ namespace AoC2025_Day8
                         newGroup.AddConnections(group);
                         connectionGroups.Remove(group);
                     }
+
                     connectionGroups.Add(newGroup);
                     break;
                 }
@@ -179,7 +148,7 @@ namespace AoC2025_Day8
         {
             return _connections.Any(t => t.HasOverlap(connection));
         }
-        
+
         public int CountBoxes()
         {
             var boxes = new HashSet<JunctionBox>();
@@ -191,7 +160,7 @@ namespace AoC2025_Day8
 
             return boxes.Count;
         }
-        
+
         public override string ToString()
         {
             return "ConnectionGroup(" + string.Join(", ", _connections.Select(c => c.ToString())) + ")";
