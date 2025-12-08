@@ -17,6 +17,12 @@ public static class EnumerableExtensions
             yield return item;
         }
     }
+    
+    /// <summary>
+    /// Pipe operator - applies a function to a value (functional programming style)
+    /// </summary>
+    public static TResult Pipe<TSource, TResult>(this TSource source, Func<TSource, TResult> func) =>
+        func(source);
 }
 
 namespace Helper

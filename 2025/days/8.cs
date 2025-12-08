@@ -8,85 +8,49 @@ namespace AoC2025_Day8
         {
             const int numberOfConnectionsToProcess = 1000;
 
-            var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day);
-            var junctionBoxes = rawInput.Select(input => new JunctionBox(input)).ToList();
-
-            var connections = GetAllPossibleConnections(junctionBoxes);
-            var sortedConnections = connections.OrderBy(c => c.Length()).ToList();
-
-            var connectionGroups = new List<ConnectionGroup>();
-
-            for (var i = 0; i < numberOfConnectionsToProcess; i++)
-            {
-                ProcessConnectionGroup(sortedConnections[i], connectionGroups);
-            }
-
-            var result = CalculateResultFromTopGroups(connectionGroups, topCount: 3);
-            Console.WriteLine($"Result: {result}");
-        }
-
-        private static int CalculateResultFromTopGroups(List<ConnectionGroup> connectionGroups, int topCount)
-        {
-            var topGroups = connectionGroups
+            var result = Helper.Helper.getInputAsLinesOfCurrentDay(day)
+                .Select(input => new JunctionBox(input))
+                .ToList()
+                .Pipe(GetAllPossibleConnections)
+                .OrderBy(c => c.Length())
+                .Take(numberOfConnectionsToProcess)
+                .Aggregate(
+                    new List<ConnectionGroup>(),
+                    (groups, connection) => ProcessConnectionGroup(connection, groups)
+                )
                 .OrderByDescending(g => g.CountBoxes())
-                .Take(topCount)
-                .ToList();
+                .Take(3)
+                .Aggregate(1, (acc, group) => acc * group.CountBoxes());
 
-            return topGroups.Aggregate(1, (acc, group) => acc * group.CountBoxes());
+            Console.WriteLine($"Result: {result}");
         }
 
         public void SolvePart2()
         {
-            var rawInput = Helper.Helper.getInputAsLinesOfCurrentDay(day);
-            var junctionBoxes = rawInput.Select(input => new JunctionBox(input)).ToList();
+            var junctionBoxes = Helper.Helper.getInputAsLinesOfCurrentDay(day)
+                .Select(input => new JunctionBox(input))
+                .ToList();
 
-            var connections = GetAllPossibleConnections(junctionBoxes);
-            var sortedConnections = connections.OrderBy(c => c.Length()).ToList();
+            var sortedConnections = GetAllPossibleConnections(junctionBoxes)
+                .OrderBy(c => c.Length())
+                .ToList();
 
             var connectionGroups = new List<ConnectionGroup>();
-
             var i = 0;
 
             do
             {
                 Console.WriteLine("Connecting: " + sortedConnections[i] + " at index " + i);
-                ProcessConnectionGroup(sortedConnections[i], connectionGroups);
+                connectionGroups = ProcessConnectionGroup(sortedConnections[i], connectionGroups);
 
                 i++;
             } while (connectionGroups.Count < 1 || connectionGroups[0].CountBoxes() < junctionBoxes.Count);
 
             var lastConnection = sortedConnections[i - 1];
-
-            Console.WriteLine("Last Connection used: " + lastConnection + " at index " + (i - 1));
+            Console.WriteLine($"Last Connection used: {lastConnection} at index {i - 1}");
 
             var result = lastConnection.Box1.x * lastConnection.Box2.x;
-            Console.WriteLine("Result: " + result);
-        }
-
-        /// <summary>
-        /// Finds all connection groups that contain at least one box from the given connection.
-        /// </summary>
-        private static List<ConnectionGroup> IsPartOfExistingConnectionGroup(Connection connection,
-            List<ConnectionGroup> groups)
-        {
-            return groups.Where(group => group.IsPartOfConnection(connection)).ToList();
-        }
-
-        /// <summary>
-        /// Generates all possible connections between junction boxes (n choose 2).
-        /// </summary>
-        private static List<Connection> GetAllPossibleConnections(List<JunctionBox> boxes)
-        {
-            var connections = new List<Connection>();
-            for (var i = 0; i < boxes.Count; i++)
-            {
-                for (var j = i + 1; j < boxes.Count; j++)
-                {
-                    connections.Add(new Connection(boxes[i], boxes[j]));
-                }
-            }
-
-            return connections;
+            Console.WriteLine($"Result: {result}");
         }
 
         /// <summary>
@@ -95,7 +59,8 @@ namespace AoC2025_Day8
         /// </summary>
         /// <param name="connection">The connection to process</param>
         /// <param name="connectionGroups">The list of existing connection groups</param>
-        private static void ProcessConnectionGroup(Connection connection, List<ConnectionGroup> connectionGroups)
+        private static List<ConnectionGroup> ProcessConnectionGroup(Connection connection,
+            List<ConnectionGroup> connectionGroups)
         {
             var matchingGroups = IsPartOfExistingConnectionGroup(connection, connectionGroups);
             switch (matchingGroups.Count)
@@ -122,7 +87,25 @@ namespace AoC2025_Day8
                     break;
                 }
             }
+
+            return connectionGroups;
         }
+
+        /// <summary>
+        /// Finds all connection groups that contain at least one box from the given connection.
+        /// </summary>
+        private static List<ConnectionGroup> IsPartOfExistingConnectionGroup(Connection connection,
+            List<ConnectionGroup> groups) =>
+            groups.Where(group => group.IsPartOfConnection(connection)).ToList();
+
+        /// <summary>
+        /// Generates all possible connections between junction boxes (n choose 2).
+        /// </summary>
+        private static List<Connection> GetAllPossibleConnections(List<JunctionBox> boxes) =>
+            boxes.SelectMany((box, i) => boxes
+                    .Skip(i + 1)
+                    .Select(otherBox => new Connection(box, otherBox)))
+                .ToList();
     }
 
     internal class ConnectionGroup(List<Connection> connections)
@@ -144,52 +127,33 @@ namespace AoC2025_Day8
             this._connections.AddRange(group._connections);
         }
 
-        public bool IsPartOfConnection(Connection connection)
-        {
-            return _connections.Any(t => t.HasOverlap(connection));
-        }
+        public bool IsPartOfConnection(Connection connection) =>
+            _connections.Any(t => t.HasOverlap(connection));
 
-        public int CountBoxes()
-        {
-            var boxes = new HashSet<JunctionBox>();
-            foreach (var connection in _connections)
-            {
-                boxes.Add(connection.Box1);
-                boxes.Add(connection.Box2);
-            }
+        public int CountBoxes() =>
+            _connections
+                .SelectMany(c => new[] { c.Box1, c.Box2 })
+                .ToHashSet()
+                .Count;
 
-            return boxes.Count;
-        }
-
-        public override string ToString()
-        {
-            return "ConnectionGroup(" + string.Join(", ", _connections.Select(c => c.ToString())) + ")";
-        }
+        public override string ToString() =>
+            $"ConnectionGroup({string.Join(", ", _connections)})";
     }
 
     internal class Connection(JunctionBox box1, JunctionBox box2)
     {
         public readonly JunctionBox Box1 = box1, Box2 = box2;
 
-        public double Length()
-        {
-            return Box1.DistanceTo(Box2);
-        }
+        public double Length() => Box1.DistanceTo(Box2);
 
-        private bool HasBox(JunctionBox obj)
-        {
-            return this.Box1.Equals(obj) || this.Box2.Equals(obj);
-        }
+        private bool HasBox(JunctionBox obj) =>
+            Box1.Equals(obj) || Box2.Equals(obj);
 
-        public bool HasOverlap(Connection other)
-        {
-            return this.HasBox(other.Box1) || this.HasBox(other.Box2);
-        }
+        public bool HasOverlap(Connection other) =>
+            HasBox(other.Box1) || HasBox(other.Box2);
 
-        public override string ToString()
-        {
-            return "Connection(" + Box1.ToString() + " <-> " + Box2.ToString() + ")";
-        }
+        public override string ToString() =>
+            $"Connection({Box1} <-> {Box2})";
     }
 
     internal class JunctionBox
@@ -211,32 +175,19 @@ namespace AoC2025_Day8
             this.z = long.Parse(split[2]);
         }
 
-        public override string ToString()
-        {
-            return "JunctionBox(" + x + "," + y + "," + z + ")";
-        }
+        public override string ToString() =>
+            $"JunctionBox({x},{y},{z})";
 
         public double DistanceTo(JunctionBox other)
         {
-            var dx = this.x - other.x;
-            var dy = this.y - other.y;
-            var dz = this.z - other.z;
+            var (dx, dy, dz) = (x - other.x, y - other.y, z - other.z);
             return Math.Sqrt(dx * dx + dy * dy + dz * dz);
         }
 
-        public override bool Equals(object? obj)
-        {
-            if (obj is JunctionBox other)
-            {
-                return this.x == other.x && this.y == other.y && this.z == other.z;
-            }
+        public override bool Equals(object? obj) =>
+            obj is JunctionBox other && x == other.x && y == other.y && z == other.z;
 
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return this.x.GetHashCode() ^ this.y.GetHashCode() ^ this.z.GetHashCode();
-        }
+        public override int GetHashCode() =>
+            HashCode.Combine(x, y, z);
     }
 }
