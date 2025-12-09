@@ -37,14 +37,14 @@ namespace AoC2023_Day18
         }
 
         public void PrintGrid(List<Position> tiles){
-            int minX = tiles.Min(t => t.x);
-            int maxX = tiles.Max(t => t.x);
-            int minY = tiles.Min(t => t.y);
-            int maxY = tiles.Max(t => t.y);
+            var minX = tiles.Min(t => t.x);
+            var maxX = tiles.Max(t => t.x);
+            var minY = tiles.Min(t => t.y);
+            var maxY = tiles.Max(t => t.y);
 
-            for (int y = minY; y <= maxY; y++)
+            for (var y = minY; y <= maxY; y++)
             {
-                for (int x = minX; x <= maxX; x++)
+                for (var x = minX; x <= maxX; x++)
                 {
                     Console.Write(tiles.Contains(new Position(x, y)) ? "#" : " ");   
                 }
